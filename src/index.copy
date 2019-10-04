@@ -1,0 +1,133 @@
+import {
+  JupyterFrontEnd, JupyterFrontEndPlugin
+} from '@jupyterlab/application';
+
+import {IMainMenu} from '@jupyterlab/mainmenu';
+// import {IMainMenu, JupyterLabMenu} from '@jupyterlab/mainmenu';
+
+import {IFrame, ICommandPalette} from '@jupyterlab/apputils';
+
+import {Menu} from '@phosphor/widgets';
+
+import '../style/index.css';
+
+/**
+ * Initialization data for the managementextension extension.
+ */
+const extension: JupyterFrontEndPlugin<void> = {
+  id: 'managementextension',
+  autoStart: true,
+/*  activate: (app: JupyterFrontEnd, mainMenu: IMainMenu) => {
+    console.log('JupyterLab extension managementextension is activated!');
+    const { commands } = app;
+    let mgmtMenu = new JupyterLabMenu({ commands });
+    mgmtMenu.menu.title.label = 'Management';
+
+    let prepareMenu = new Menu({ commands }); // sub-menu
+    prepareMenu.title.label = 'Prepare';
+
+    let commitMenu = new Menu({ commands }); // sub-menu
+    commitMenu.title.label = 'Commit';
+
+    mgmtMenu.addGroup([
+      { type: 'submenu' as Menu.ItemType, submenu: prepareMenu},
+      { type: 'submenu' as Menu.ItemType, submenu: commitMenu},
+    ], 0);
+    mainMenu.addMenu(mgmtMenu.menu, { rank : 4 });
+  }, */
+
+  // activate: activate_custom_menu,
+  requires: [
+    IMainMenu, ICommandPalette
+  ],
+  activate: (
+    app: JupyterFrontEnd,
+    palette: ICommandPalette,
+    labShell: ILabShell | null
+  ): IMainMenu => {
+    const { commands } = app;
+
+    let menu = new MainMenu(commands);
+    // Create the application menus.
+    // createViewMenu(app, menu.viewMenu);
+
+    // The tabs menu relies on lab shell functionality.
+    createManagementMenu(app, menu.managementMenu);
+
+    // Create commands to open the main application menus.
+    const activateMenu = (item: Menu) => {
+      menu.activeMenu = item;
+      menu.openActiveMenu();
+    };
+
+     
+    commands.addCommand(CommandIDs.openTabs, {
+      label: 'Open Management Menu',
+      execute: () => activateMenu(menu.managementMenu.menu)
+    });
+    
+
+    
+
+   
+
+    palette.addItem({
+      command: CommandIDs.activatePreviouslyUsedTab,
+      category: 'Main Area'
+    });
+
+    // app.shell.add(logo, 'top');
+    // app.shell.add(menu, 'top');
+
+    return menu;
+  }
+};
+
+export function createManagementMenu(
+  app: JupyterFrontEnd,
+  menu: ManagementMenu,
+  labShell: ILabShell | null
+): void {
+  const commands = app.commands;
+
+  // Add commands for cycling the active tabs.
+  menu.addGroup(
+    [
+      { command: 'application:activate-prepare' },
+      { command: 'application:activate-commit' },
+      { command: CommandIDs.activatePreviouslyUsedTab }
+    ],
+    0
+  );
+
+  // A list of the active tabs in the main area.
+  const tabGroup: Menu.IItemOptions[] = [];
+  // A disposable for getting rid of the out-of-date tabs list.
+  let disposable: IDisposable;
+
+  // Command to activate a widget by id.
+  commands.addCommand(CommandIDs.activateById, {
+    label: args => {
+      const id = args['id'] || '';
+      const widget = find(app.shell.widgets('main'), w => w.id === id);
+      return (widget && widget.title.label) || '';
+    },
+    isToggled: args => {
+      const id = args['id'] || '';
+      return app.shell.currentWidget && app.shell.currentWidget.id === id;
+    },
+    execute: args => app.shell.activateById((args['id'] as string) || '')
+  });
+
+  let previousId = '';
+  // Command to toggle between the current
+  // tab and the last modified tab.
+  commands.addCommand(CommandIDs.activatePreviouslyUsedTab, {
+    label: 'Activate Previously Used Tab',
+    isEnabled: () => !!previousId,
+    execute: () => commands.execute(CommandIDs.activateById, { id: previousId })
+  });
+}
+
+export default extension;
+
