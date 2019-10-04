@@ -1,0 +1,5 @@
+{
+    "local_extensions": {
+        "managementextension": "/home/dev/jupyter_lab/managementextension"
+    }
+}
