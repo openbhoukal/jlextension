@@ -38,7 +38,7 @@ namespace CommandIDs {
 
 
 /**
- * Activate the jupyterhub extension.
+ * Activate the jupyterlab managementextension.
  */
 function activateManagementExtension(app: JupyterFrontEnd, palette: ICommandPalette, mainMenu: IMainMenu): void {
 
@@ -98,7 +98,7 @@ function activateManagementExtension(app: JupyterFrontEnd, palette: ICommandPale
 
 
 /**
- * Initialization data for the jupyterlab_hub extension.
+ * Initialization data for the jupyterlab management extension.
  */
 const extension: JupyterFrontEndPlugin<void> = {
   activate: activateManagementExtension,
