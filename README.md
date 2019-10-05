@@ -1,7 +1,6 @@
-# jlextension
-# A new extension of jupyterlab
 # managementextension
 
+Menu extension with customized op
 
 
 ## Requirements
@@ -51,3 +50,4 @@ jupyter lab --watch
 ```bash
 jupyter labextension uninstall managementextension
 ```
+
